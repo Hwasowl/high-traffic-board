@@ -1,6 +1,5 @@
-package kuke.board.article.response;
+package kuke.board.article.service.response;
 
-import jakarta.persistence.Id;
 import kuke.board.article.entity.Article;
 import lombok.Getter;
 import lombok.ToString;

@@ -1,7 +1,7 @@
 package kuke.board.article.api;
 
-import kuke.board.article.request.ArticleCreateRequest;
-import kuke.board.article.response.ArticleResponse;
+import kuke.board.article.service.response.ArticlePageResponse;
+import kuke.board.article.service.response.ArticleResponse;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.junit.jupiter.api.Test;
@@ -81,5 +81,19 @@ public class ArticleApiTest {
         restClient.delete()
                 .uri("/v1/articles/{articleId}", articleId)
                 .retrieve();
+    }
+
+    @Test
+    void readAllTest() {
+        ArticlePageResponse body = restClient.get()
+            .uri("/v1/articles?boardId=1&pageSize=30&page=50000")
+            .retrieve()
+            .body(ArticlePageResponse.class);
+
+        System.out.println("readAll = " + body.getArticleCount());
+
+        for (ArticleResponse article : body.getArticles()) {
+            System.out.println("article = " + article);
+        }
     }
 }

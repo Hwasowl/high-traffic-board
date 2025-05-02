@@ -2,9 +2,10 @@ package kuke.board.article.service;
 
 import kuke.board.article.entity.Article;
 import kuke.board.article.repository.ArticleRepository;
-import kuke.board.article.request.ArticleCreateRequest;
-import kuke.board.article.request.ArticleUpdateRequest;
-import kuke.board.article.response.ArticleResponse;
+import kuke.board.article.service.request.ArticleCreateRequest;
+import kuke.board.article.service.request.ArticleUpdateRequest;
+import kuke.board.article.service.response.ArticlePageResponse;
+import kuke.board.article.service.response.ArticleResponse;
 import kuke.board.common.snowflake.Snowflake;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -38,5 +39,12 @@ public class ArticleService {
     @Transactional
     public void delete(Long articleId) {
         articleRepository.deleteById(articleId);
+    }
+
+    public ArticlePageResponse readAll(Long boardId, Long page, Long pageSize) {
+        return ArticlePageResponse.of(
+            articleRepository.findAll(boardId, (page - 1) * pageSize, pageSize).stream().map(ArticleResponse::from).toList(),
+            articleRepository.count(boardId, PageLimitCalculator.calculatePageLimit(page, pageSize, 1L))
+        );
     }
 }
