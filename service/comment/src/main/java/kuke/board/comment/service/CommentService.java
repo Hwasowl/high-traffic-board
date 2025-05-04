@@ -80,19 +80,24 @@ public class CommentService {
     }
 
     public CommentPageResponse readAll(Long articleId, Long page, Long pageSize) {
-        return CommentPageResponse.of(
-            commentRepository.findAll(articleId, page, pageSize).stream().map(CommentResponse::from).toList(),
-            commentRepository.count(articleId, PageLimitCalculator.calculatePageLimit(page, pageSize, 10L))
-        );
+        try {
+            return CommentPageResponse.of(
+                commentRepository.findAll(articleId, (page - 1) * pageSize, pageSize).stream()
+                    .map(CommentResponse::from)
+                    .toList(),
+                commentRepository.count(articleId, PageLimitCalculator.calculatePageLimit(page, pageSize, 10L))
+            );
+        } catch(Exception e) {
+            throw new RuntimeException("Error occurred while reading comments + ", e);
+        }
     }
 
     public List<CommentResponse> readAll(Long articleId, Long lastParentCommentId, Long lastCommentId, Long limit) {
         List<Comment> comments = lastParentCommentId == null || lastCommentId == null ?
             commentRepository.findAllInfiniteScroll(articleId, limit) :
-            commentRepository.findAllInfiniteScroll(articleId, lastParentCommentId, lastCommentId, limit)
-                .stream()
-                .filter(not(Comment::getDeleted))
-                .toList();
-        return comments.stream().map(CommentResponse::from).toList();
+            commentRepository.findAllInfiniteScroll(articleId, lastParentCommentId, lastCommentId, limit);
+        return comments.stream()
+            .map(CommentResponse::from)
+            .toList();
     }
 }
