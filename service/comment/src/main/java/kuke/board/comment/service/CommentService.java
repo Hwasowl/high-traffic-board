@@ -3,11 +3,14 @@ package kuke.board.comment.service;
 import kuke.board.comment.entity.Comment;
 import kuke.board.comment.repository.CommentRepository;
 import kuke.board.comment.service.request.CommentCreateRequest;
+import kuke.board.comment.service.response.CommentPageResponse;
 import kuke.board.comment.service.response.CommentResponse;
 import kuke.board.common.snowflake.Snowflake;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 import static java.util.function.Predicate.not;
 
@@ -74,5 +77,22 @@ public class CommentService {
             .filter(not(Comment::getDeleted))
             .filter(Comment::isRoot)
             .orElseThrow();
+    }
+
+    public CommentPageResponse readAll(Long articleId, Long page, Long pageSize) {
+        return CommentPageResponse.of(
+            commentRepository.findAll(articleId, page, pageSize).stream().map(CommentResponse::from).toList(),
+            commentRepository.count(articleId, PageLimitCalculator.calculatePageLimit(page, pageSize, 10L))
+        );
+    }
+
+    public List<CommentResponse> readAll(Long articleId, Long lastParentCommentId, Long lastCommentId, Long limit) {
+        List<Comment> comments = lastParentCommentId == null || lastCommentId == null ?
+            commentRepository.findAllInfiniteScroll(articleId, limit) :
+            commentRepository.findAllInfiniteScroll(articleId, lastParentCommentId, lastCommentId, limit)
+                .stream()
+                .filter(not(Comment::getDeleted))
+                .toList();
+        return comments.stream().map(CommentResponse::from).toList();
     }
 }
