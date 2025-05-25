@@ -1,4 +1,4 @@
-rootProject.name = 'kuke-board'
+rootProject.name = 'high-traffic-board'
 
 include 'common'
 include 'common:snowflake'

@@ -1,4 +1,4 @@
-package kuke.board.article;
+package kuke.board.view;
 
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
