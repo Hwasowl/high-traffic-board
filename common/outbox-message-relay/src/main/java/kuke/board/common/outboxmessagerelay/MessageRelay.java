@@ -42,8 +42,8 @@ public class MessageRelay {
                 outbox.getPayload()
             ).get(1, TimeUnit.SECONDS);
             outboxRepository.delete(outbox);
-        } catch(Exception e) {
-            log.error("[MessageRelay.publishEvent] outboxEvent={}", outbox, e);
+        } catch (Exception e) {
+            log.error("[MessageRelay.publishEvent] outbox={}", outbox, e);
         }
     }
 
@@ -51,14 +51,16 @@ public class MessageRelay {
         fixedDelay = 10,
         initialDelay = 5,
         timeUnit = TimeUnit.SECONDS,
-        scheduler = "messageRelayProcessEventExecutor"
+        scheduler = "messageRelayPublishPendingEventExecutor"
     )
     public void publishPendingEvent() {
         AssignedShard assignedShard = messageRelayCoordinator.assignedShards();
         log.info("[MessageRelay.publishPendingEvent] assignedShard size={}", assignedShard.getShards().size());
         for (Long shard : assignedShard.getShards()) {
             List<Outbox> outboxes = outboxRepository.findAllByShardKeyAndCreatedAtLessThanEqualOrderByCreatedAtAsc(
-                shard, LocalDateTime.now().minusSeconds(10), Pageable.ofSize(100)
+                shard,
+                LocalDateTime.now().minusSeconds(10),
+                Pageable.ofSize(100)
             );
             for (Outbox outbox : outboxes) {
                 publishEvent(outbox);

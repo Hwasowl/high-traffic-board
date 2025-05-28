@@ -8,14 +8,15 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 
 @EnableAsync
 @Configuration
@@ -47,7 +48,11 @@ public class MessageRelayConfig {
     }
 
     @Bean
-    public Executor messageRelayProcessEventExecutor() {
-        return Executors.newSingleThreadExecutor();
+    public TaskScheduler messageRelayPublishPendingEventExecutor() {
+        ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
+        scheduler.setPoolSize(1);
+        scheduler.setThreadNamePrefix("task-scheduler-");
+        scheduler.initialize();
+        return scheduler;
     }
 }
