@@ -23,15 +23,14 @@ public class ArticleClient {
         restClient = RestClient.create(articleServiceUrl);
     }
 
-    public ArticleResponse getArticle(Long articleId) {
-        log.info("Fetching article with ID: {}", articleId);
+    public ArticleResponse read(Long articleId) {
         try {
             return restClient.get()
-                .uri("/articles/{articleId}", articleId)
+                .uri("/v1/articles/{articleId}", articleId)
                 .retrieve()
                 .body(ArticleResponse.class);
         } catch (Exception e) {
-            log.error("[ArticleClient.read] articleId={}", articleId);
+            log.error("[ArticleClient.read] articleId={}", articleId, e);
         }
         return null;
     }

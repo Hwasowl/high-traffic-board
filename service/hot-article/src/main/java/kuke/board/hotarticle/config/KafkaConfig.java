@@ -9,7 +9,7 @@ import org.springframework.kafka.listener.ContainerProperties;
 @Configuration
 public class KafkaConfig {
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, String> concurrentKafkaListenerContainerFactory(
+    public ConcurrentKafkaListenerContainerFactory<String, String> kafkaListenerContainerFactory(
         ConsumerFactory<String, String> consumerFactory
     ) {
         ConcurrentKafkaListenerContainerFactory<String, String> factory = new ConcurrentKafkaListenerContainerFactory<>();

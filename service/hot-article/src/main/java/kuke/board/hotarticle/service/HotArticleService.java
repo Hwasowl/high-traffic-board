@@ -36,21 +36,20 @@ public class HotArticleService {
         }
     }
 
-    private boolean isArticleCreatedOrDeleted(Event<EventPayload> event) {
-        return EventType.ARTICLE_CREATED == event.getType()
-            || EventType.ARTICLE_DELETED == event.getType();
-    }
-
     private EventHandler<EventPayload> findEventHandler(Event<EventPayload> event) {
         return eventHandlers.stream()
-                .filter(handler -> handler.supports(event))
-                .findFirst()
-                .orElse(null);
+            .filter(eventHandler -> eventHandler.supports(event))
+            .findAny()
+            .orElse(null);
     }
 
-    public List<HotArticleResponse> readAll(String dataStr) {
-        return hotArticleListRepository.readAll(dataStr).stream()
-            .map(articleClient::getArticle)
+    private boolean isArticleCreatedOrDeleted(Event<EventPayload> event) {
+        return EventType.ARTICLE_CREATED == event.getType() || EventType.ARTICLE_DELETED == event.getType();
+    }
+
+    public List<HotArticleResponse> readAll(String dateStr) {
+        return hotArticleListRepository.readAll(dateStr).stream()
+            .map(articleClient::read)
             .filter(Objects::nonNull)
             .map(HotArticleResponse::from)
             .toList();

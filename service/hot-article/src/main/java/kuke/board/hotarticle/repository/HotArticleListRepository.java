@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.connection.StringRedisConnection;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Repository;
 
 import java.time.Duration;
@@ -25,11 +26,11 @@ public class HotArticleListRepository {
 
     public void add(Long articleId, LocalDateTime time, Long score, Long limit, Duration ttl) {
         redisTemplate.executePipelined((RedisCallback<?>) action -> {
-            StringRedisConnection connection = (StringRedisConnection) action;
+            StringRedisConnection conn = (StringRedisConnection) action;
             String key = generateKey(time);
-            connection.zAdd(key, score, String.valueOf(articleId));
-            connection.zRemRange(key, 0, -limit - 1);
-            connection.expire(key, ttl.toSeconds());
+            conn.zAdd(key, score, String.valueOf(articleId));
+            conn.zRemRange(key, 0, - limit - 1);
+            conn.expire(key, ttl.toSeconds());
             return null;
         });
     }
@@ -42,15 +43,17 @@ public class HotArticleListRepository {
         return generateKey(TIME_FORMATTER.format(time));
     }
 
-    private String generateKey(String date) {
-        return String.format(KEY_FORMAT, date);
+    private String generateKey(String dateStr) {
+        return KEY_FORMAT.formatted(dateStr);
     }
 
-    public List<Long> readAll(String key) {
+    public List<Long> readAll(String dateStr) {
         return redisTemplate.opsForZSet()
-            .reverseRangeWithScores(generateKey(key), 0, -1).stream()
-            .peek(tuple -> log.info("[HotArticleListResponse.readAll] articleId={}, score={}", tuple.getValue(), tuple.getScore()))
-            .map(tuple -> Long.valueOf(tuple.getValue()))
+            .reverseRangeWithScores(generateKey(dateStr), 0, -1).stream()
+            .peek(tuple ->
+                log.info("[HotArticleListRepository.readAll] articleId={}, score={}", tuple.getValue(), tuple.getScore()))
+            .map(ZSetOperations.TypedTuple::getValue)
+            .map(Long::valueOf)
             .toList();
     }
 }
