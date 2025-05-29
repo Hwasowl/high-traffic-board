@@ -20,27 +20,22 @@ public class ArticleController {
         return articleService.read(articleId);
     }
 
-    @GetMapping("/v1/articles/boards/{boardId}/count")
-    public Long count(@PathVariable Long boardId) {
-        return articleService.count(boardId);
-    }
-
     @GetMapping("/v1/articles")
     public ArticlePageResponse readAll(
-            @RequestParam("boardId") Long boardId,
-            @RequestParam("page") Long page,
-            @RequestParam("pageSize") Long pageSize
+        @RequestParam("boardId") Long boardId,
+        @RequestParam("page") Long page,
+        @RequestParam("pageSize") Long pageSize
     ) {
         return articleService.readAll(boardId, page, pageSize);
     }
 
     @GetMapping("/v1/articles/infinite-scroll")
     public List<ArticleResponse> readAllInfiniteScroll(
-            @RequestParam("boardId") Long boardId,
-            @RequestParam("pageSize") Long pageSize,
-            @RequestParam(value = "lastArticleId", required = false) Long lastArticleId
+        @RequestParam("boardId") Long boardId,
+        @RequestParam("pageSize") Long pageSize,
+        @RequestParam(value = "lastArticleId", required = false) Long lastArticleId
     ) {
-        return articleService.readAllInfinityScroll(boardId, pageSize, lastArticleId);
+        return articleService.readAllInfiniteScroll(boardId, pageSize, lastArticleId);
     }
 
     @PostMapping("/v1/articles")
@@ -56,5 +51,10 @@ public class ArticleController {
     @DeleteMapping("/v1/articles/{articleId}")
     public void delete(@PathVariable Long articleId) {
         articleService.delete(articleId);
+    }
+
+    @GetMapping("/v1/articles/boards/{boardId}/count")
+    public Long count(@PathVariable Long boardId) {
+        return articleService.count(boardId);
     }
 }

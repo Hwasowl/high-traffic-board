@@ -28,6 +28,7 @@ public class MessageRelay {
         outboxRepository.save(outboxEvent.getOutbox());
     }
 
+
     @Async("messageRelayPublishEventExecutor")
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void publishEvent(OutboxEvent outboxEvent) {
@@ -54,7 +55,7 @@ public class MessageRelay {
         scheduler = "messageRelayPublishPendingEventExecutor"
     )
     public void publishPendingEvent() {
-        AssignedShard assignedShard = messageRelayCoordinator.assignedShards();
+        AssignedShard assignedShard = messageRelayCoordinator.assignShards();
         log.info("[MessageRelay.publishPendingEvent] assignedShard size={}", assignedShard.getShards().size());
         for (Long shard : assignedShard.getShards()) {
             List<Outbox> outboxes = outboxRepository.findAllByShardKeyAndCreatedAtLessThanEqualOrderByCreatedAtAsc(

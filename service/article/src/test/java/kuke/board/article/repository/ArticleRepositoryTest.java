@@ -33,13 +33,13 @@ class ArticleRepositoryTest {
 
     @Test
     void findInfinityScrollTest() {
-        List<Article> articles = articleRepository.findALlInfiniteScroll(1L, 30L);
+        List<Article> articles = articleRepository.findAllInfiniteScroll(1L, 30L);
         for (Article article : articles) {
             log.info("article1 = {}", article.getArticleId());
         }
 
         Long lastArticleId = articles.get(articles.size() - 1).getArticleId();
-        List<Article> articles1 = articleRepository.findALlInfiniteScroll(1L, 30L, lastArticleId);
+        List<Article> articles1 = articleRepository.findAllInfiniteScroll(1L, 30L, lastArticleId);
         for (Article article : articles1) {
             log.info("article2 = {}", article.getArticleId());
         }

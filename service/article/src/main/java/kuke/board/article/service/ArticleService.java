@@ -15,11 +15,13 @@ import kuke.board.common.event.payload.ArticleUpdatedEventPayload;
 import kuke.board.common.outboxmessagerelay.OutboxEventPublisher;
 import kuke.board.common.snowflake.Snowflake;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ArticleService {
@@ -39,6 +41,7 @@ public class ArticleService {
                 BoardArticleCount.init(request.getBoardId(), 1L)
             );
         }
+
         outboxEventPublisher.publish(
             EventType.ARTICLE_CREATED,
             ArticleCreatedEventPayload.builder()
@@ -53,6 +56,8 @@ public class ArticleService {
                 .build(),
             article.getBoardId()
         );
+        log.info("Article created: {}", article.getArticleId());
+
         return ArticleResponse.from(article);
     }
 
@@ -103,15 +108,20 @@ public class ArticleService {
 
     public ArticlePageResponse readAll(Long boardId, Long page, Long pageSize) {
         return ArticlePageResponse.of(
-            articleRepository.findAll(boardId, (page - 1) * pageSize, pageSize).stream().map(ArticleResponse::from).toList(),
-            articleRepository.count(boardId, PageLimitCalculator.calculatePageLimit(page, pageSize, 1L))
+            articleRepository.findAll(boardId, (page - 1) * pageSize, pageSize).stream()
+                .map(ArticleResponse::from)
+                .toList(),
+            articleRepository.count(
+                boardId,
+                PageLimitCalculator.calculatePageLimit(page, pageSize, 10L)
+            )
         );
     }
 
-    public List<ArticleResponse> readAllInfinityScroll(Long boardId, Long pageSize, Long lastArticleId) {
+    public List<ArticleResponse> readAllInfiniteScroll(Long boardId, Long pageSize, Long lastArticleId) {
         List<Article> articles = lastArticleId == null ?
-            articleRepository.findALlInfiniteScroll(boardId, pageSize) :
-            articleRepository.findALlInfiniteScroll(boardId, pageSize, lastArticleId);
+            articleRepository.findAllInfiniteScroll(boardId, pageSize) :
+            articleRepository.findAllInfiniteScroll(boardId, pageSize, lastArticleId);
         return articles.stream().map(ArticleResponse::from).toList();
     }
 

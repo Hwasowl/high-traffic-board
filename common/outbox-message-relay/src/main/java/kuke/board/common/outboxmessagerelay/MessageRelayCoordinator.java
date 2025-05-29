@@ -27,12 +27,14 @@ public class MessageRelayCoordinator {
     private final int PING_INTERVAL_SECONDS = 3;
     private final int PING_FAILURE_THRESHOLD = 3;
 
-    public AssignedShard assignedShards() {
+    public AssignedShard assignShards() {
         return AssignedShard.of(APP_ID, findAppIds(), MessageRelayConstants.SHARD_COUNT);
     }
 
     private List<String> findAppIds() {
-        return redisTemplate.opsForZSet().reverseRange(generateKey(), 0, -1).stream().sorted().toList();
+        return redisTemplate.opsForZSet().reverseRange(generateKey(), 0, -1).stream()
+            .sorted()
+            .toList();
     }
 
     @Scheduled(fixedDelay = PING_INTERVAL_SECONDS, timeUnit = TimeUnit.SECONDS)
@@ -44,7 +46,7 @@ public class MessageRelayCoordinator {
             conn.zRemRangeByScore(
                 key,
                 Double.NEGATIVE_INFINITY,
-                Instant.now().minusSeconds(PING_FAILURE_THRESHOLD * PING_INTERVAL_SECONDS).toEpochMilli()
+                Instant.now().minusSeconds(PING_INTERVAL_SECONDS * PING_FAILURE_THRESHOLD).toEpochMilli()
             );
             return null;
         });
