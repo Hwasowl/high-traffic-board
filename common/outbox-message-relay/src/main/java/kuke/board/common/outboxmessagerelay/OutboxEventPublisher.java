@@ -22,13 +22,11 @@ public class OutboxEventPublisher {
             outboxIdSnowflake.nextId(),
             type,
             Event.of(
-                eventIdSnowflake.nextId(),
-                type,
-                payload
+                eventIdSnowflake.nextId(), type, payload
             ).toJson(),
-            shardKey % MessageRelayConstants.SHARD_COUNT,
-            LocalDateTime.now()
+            shardKey % MessageRelayConstants.SHARD_COUNT
         );
-        applicationEventPublisher.publishEvent(outbox);
+        applicationEventPublisher.publishEvent(OutboxEvent.of(outbox));
     }
 }
+
