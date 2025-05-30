@@ -1,9 +1,10 @@
 package kuke.board.articleread.service.response;
 
-import kuke.board.articleread.client.ArticleClient;
 import kuke.board.articleread.repository.ArticleQueryModel;
 import lombok.Getter;
 import lombok.ToString;
+
+import java.time.LocalDateTime;
 
 @Getter
 @ToString
@@ -13,8 +14,8 @@ public class ArticleReadResponse {
     private String content;
     private Long boardId;
     private Long writerId;
-    private String createdAt;
-    private String modifiedAt;
+    private LocalDateTime createdAt;
+    private LocalDateTime modifiedAt;
     private Long articleCommentCount;
     private Long articleLikeCount;
     private Long articleViewCount;

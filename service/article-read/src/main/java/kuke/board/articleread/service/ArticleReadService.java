@@ -31,7 +31,7 @@ public class ArticleReadService {
 
     public void handleEvent(Event<EventPayload> event) {
         for (EventHandler eventHandler : eventHandlers) {
-            if(eventHandler.supports(event)) {
+            if (eventHandler.supports(event)) {
                 eventHandler.handle(event);
             }
         }

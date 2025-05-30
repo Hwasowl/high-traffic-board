@@ -4,6 +4,8 @@ import kuke.board.articleread.client.ArticleClient;
 import kuke.board.common.event.payload.*;
 import lombok.Getter;
 
+import java.time.LocalDateTime;
+
 @Getter
 public class ArticleQueryModel {
     private Long articleId;
@@ -11,37 +13,37 @@ public class ArticleQueryModel {
     private String content;
     private Long boardId;
     private Long writerId;
-    private String createdAt;
-    private String modifiedAt;
+    private LocalDateTime createdAt;
+    private LocalDateTime modifiedAt;
     private Long articleCommentCount;
     private Long articleLikeCount;
 
     public static ArticleQueryModel create(ArticleCreatedEventPayload payload) {
-        ArticleQueryModel model = new ArticleQueryModel();
-        model.articleId = payload.getArticleId();
-        model.title = payload.getTitle();
-        model.content = payload.getContent();
-        model.boardId = payload.getBoardId();
-        model.writerId = payload.getWriterId();
-        model.createdAt = payload.getCreatedAt().toString();
-        model.modifiedAt = payload.getModifiedAt().toString();
-        model.articleCommentCount = 0L;
-        model.articleLikeCount = 0L;
-        return model;
+        ArticleQueryModel articleQueryModel = new ArticleQueryModel();
+        articleQueryModel.articleId = payload.getArticleId();
+        articleQueryModel.title = payload.getTitle();
+        articleQueryModel.content = payload.getContent();
+        articleQueryModel.boardId = payload.getBoardId();
+        articleQueryModel.writerId = payload.getWriterId();
+        articleQueryModel.createdAt = payload.getCreatedAt();
+        articleQueryModel.modifiedAt = payload.getModifiedAt();
+        articleQueryModel.articleCommentCount = 0L;
+        articleQueryModel.articleLikeCount = 0L;
+        return articleQueryModel;
     }
 
-    public static ArticleQueryModel create(ArticleClient.ArticleResponse response, Long articleCommentCount, Long articleLikeCount) {
-        ArticleQueryModel model = new ArticleQueryModel();
-        model.articleId = response.getArticleId();
-        model.title = response.getTitle();
-        model.content = response.getContent();
-        model.boardId = response.getBoardId();
-        model.writerId = response.getWriterId();
-        model.createdAt = response.getCreatedAt();
-        model.modifiedAt = response.getModifiedAt();
-        model.articleCommentCount = articleCommentCount;
-        model.articleLikeCount = articleLikeCount;
-        return model;
+    public static ArticleQueryModel create(ArticleClient.ArticleResponse article, Long commentCount, Long likeCount) {
+        ArticleQueryModel articleQueryModel = new ArticleQueryModel();
+        articleQueryModel.articleId = article.getArticleId();
+        articleQueryModel.title = article.getTitle();
+        articleQueryModel.content = article.getContent();
+        articleQueryModel.boardId = article.getBoardId();
+        articleQueryModel.writerId = article.getWriterId();
+        articleQueryModel.createdAt = article.getCreatedAt();
+        articleQueryModel.modifiedAt = article.getModifiedAt();
+        articleQueryModel.articleCommentCount = commentCount;
+        articleQueryModel.articleLikeCount = likeCount;
+        return articleQueryModel;
     }
 
     public void updateBy(CommentCreatedEventPayload payload) {
@@ -53,11 +55,11 @@ public class ArticleQueryModel {
     }
 
     public void updateBy(ArticleLikedEventPayload payload) {
-        this.articleCommentCount = payload.getArticleLikeCount();
+        this.articleLikeCount = payload.getArticleLikeCount();
     }
 
     public void updateBy(ArticleUnlikedEventPayload payload) {
-        this.articleCommentCount = payload.getArticleLikeCount();
+        this.articleLikeCount = payload.getArticleLikeCount();
     }
 
     public void updateBy(ArticleUpdatedEventPayload payload) {
@@ -65,7 +67,7 @@ public class ArticleQueryModel {
         this.content = payload.getContent();
         this.boardId = payload.getBoardId();
         this.writerId = payload.getWriterId();
-        this.createdAt = payload.getCreatedAt().toString();
-        this.modifiedAt = payload.getModifiedAt().toString();
+        this.createdAt = payload.getCreatedAt();
+        this.modifiedAt = payload.getModifiedAt();
     }
 }
